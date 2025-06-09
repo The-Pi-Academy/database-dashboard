@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/main.css"/>
+  <title>SQL Learning Dashboard</title>
+</head>
+<body>
+<div class="header">
+  <h1>🗄️ SQL Learning Dashboard</h1>
+  <p>Explore SQL - Built for Young Coders</p>
+</div>
+
+<div class="container">
+  <div class="sidebar">
+    <div class="query-section">
+      <h3>
+        <span class="status-indicator"></span>
+        <span id="current-db-title">SQL Query Builder</span>
+      </h3>
+      <textarea id="query-input" class="query-input"></textarea>
+      <button id="execute-btn" class="fancy-btn">🚀 Execute Query</button>
+      <button id="db-btn" class="fancy-btn">💾 H2 Console</button>
+    </div>
+
+    <div class="sample-queries">
+      <h4>📚 Sample Queries</h4>
+      <div id="sample-queries-list"></div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="results-area">
+      <div class="results-header">
+        <h3>📊 Query Results</h3>
+        <div class="performance-badge" id="performance-badge">⚡ 0.00ms</div>
+      </div>
+      <div class="results-content" id="results-content">
+        <p>👋 Welcome! Select a database type and run your first query to see results here.</p>
+      </div>
+      <div class="data-visualization" id="data-visualization">
+        <h4>📈 Data Visualization</h4>
+        <p>Query results will be visualized here...</p>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
