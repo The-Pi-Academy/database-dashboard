@@ -379,7 +379,6 @@ main() {
     install_essential_tools
     install_java
     install_maven
-    setup_project
     build_project
     create_run_scripts
     test_installation
