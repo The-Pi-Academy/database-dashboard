@@ -19,8 +19,7 @@ NC='\033[0m' # No Color
 # Configuration
 JAVA_VERSION="17"
 MAVEN_VERSION="3.9.6"
-PROJECT_DIR="/home/pi/database-dashboard"
-LOG_FILE="/tmp/rpi4_java_install.log"
+LOG_FILE="/tmp/database-dashboard-install.log"
 
 # Function to print colored output
 print_status() {
@@ -168,40 +167,9 @@ install_maven() {
     print_success "Maven $MAVEN_VERSION installed successfully"
 }
 
-# Function to clone and setup the project
-setup_project() {
-    print_status "Setting up the database-dashboard project..."
-
-    # Create project directory
-    if [ ! -d "$PROJECT_DIR" ]; then
-        mkdir -p "$PROJECT_DIR"
-    fi
-
-    cd "$PROJECT_DIR"
-
-    # Clone the repository
-    if [ ! -d ".git" ]; then
-        print_status "Cloning the repository..."
-        git clone https://github.com/The-Pi-Academy/database-dashboard.git . || {
-            print_warning "Failed to clone repository. You may need to clone it manually."
-            print_status "To clone manually, run: git clone https://github.com/The-Pi-Academy/database-dashboard.git $PROJECT_DIR"
-            return
-        }
-    else
-        print_status "Repository already exists, pulling latest changes..."
-        git pull origin main 2>/dev/null || git pull origin master 2>/dev/null || {
-            print_warning "Failed to pull latest changes"
-        }
-    fi
-
-    print_success "Project setup completed"
-}
-
 # Function to build the project
 build_project() {
     print_status "Building the project..."
-
-    cd "$PROJECT_DIR"
 
     # Check if pom.xml exists
     if [ -f "pom.xml" ]; then
@@ -238,7 +206,7 @@ create_run_scripts() {
     print_status "Creating run scripts..."
 
     # Create run script for the application
-    cat > "$PROJECT_DIR/run.sh" << 'EOF'
+    cat > "run.sh" << 'EOF'
 #!/bin/bash
 # SQL Learning App runner script
 
@@ -266,10 +234,10 @@ else
 fi
 EOF
 
-    chmod +x "$PROJECT_DIR/run.sh"
+    chmod +x "run.sh"
 
     # Create development script for easy Maven commands
-    cat > "$PROJECT_DIR/dev.sh" << 'EOF'
+    cat > "dev.sh" << 'EOF'
 #!/bin/bash
 # Development helper script
 
@@ -320,7 +288,7 @@ case "$1" in
 esac
 EOF
 
-    chmod +x "$PROJECT_DIR/dev.sh"
+    chmod +x "dev.sh"
 
     print_success "Run scripts created successfully"
 }
@@ -346,7 +314,7 @@ test_installation() {
     fi
 
     # Test project structure
-    if [ -f "$PROJECT_DIR/pom.xml" ]; then
+    if [ -f "pom.xml" ]; then
         print_success "Project structure looks good"
     else
         print_warning "Project may not be set up correctly"
