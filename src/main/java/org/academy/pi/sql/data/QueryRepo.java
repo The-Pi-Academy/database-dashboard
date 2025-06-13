@@ -10,7 +10,7 @@ public class QueryRepo {
   private static final List<SqlNamedQuery> SAMPLE_QUERIES = List.of(
       SqlNamedQuery.builder()
           .title("Find All")
-          .query("SELECT * FROM students;")
+          .query("SELECT * FROM STUDENTS;")
           .build(),
       SqlNamedQuery.builder()
           .title("Find By Name")
@@ -84,6 +84,29 @@ public class QueryRepo {
            AND F.FAVORITE = 'Fuscia'
            ORDER BY S.FIRST_NAME
            LIMIT 10;
+           """)
+          .build(),
+      SqlNamedQuery.builder()
+          .title("Update By Name")
+          .query("""
+           UPDATE STUDENTS SET FIRST_NAME = 'NotNanny'
+           WHERE FIRST_NAME = 'Nanny';
+           """)
+          .build(),
+      SqlNamedQuery.builder()
+          .title("Update Multiple Fields")
+          .query("""
+           UPDATE STUDENTS SET
+             USERNAME = 'new_nserot0',
+             FIRST_NAME = 'new_Nanny',
+             LAST_NAME = 'new_Serot'
+           WHERE FIRST_NAME = 'Nanny';
+           """)
+          .build(),
+      SqlNamedQuery.builder()
+          .title("Delete Record(s)")
+          .query("""
+           DELETE FROM STUDENTS WHERE FIRST_NAME = 'Nanny';
            """)
           .build()
   );

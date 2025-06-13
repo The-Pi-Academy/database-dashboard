@@ -127,6 +127,9 @@ class DbManager {
             <p><strong>Records returned:</strong> ${result.data.count}</p>
         `;
         break;
+      case 'ERROR':
+        this.displayError('I don\'t think that\'s right...', 0);
+        break;
     }
   }
 
