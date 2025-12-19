@@ -123,6 +123,8 @@ public class SqlController {
       } else {
         sendJsonResponseFor405(exchange);
       }
+    } catch (SQLException e) {
+      sendJsonResponseForSqlError(exchange, e);
     } catch (Exception e) {
       sendJsonResponseFor500(exchange, e);
     }
@@ -132,10 +134,54 @@ public class SqlController {
     sendJsonResponse(exchange, 405, ApiResponse.error("Method Not Allowed"));
   }
 
+  private void sendJsonResponseForSqlError(HttpExchange exchange, SQLException e) throws IOException {
+    String friendlyMessage = extractFriendlySqlError(e);
+    sendJsonResponse(exchange, 400, ApiResponse.error(friendlyMessage));
+  }
+
   private void sendJsonResponseFor500(HttpExchange exchange, Exception e) throws IOException {
     e.printStackTrace();
     sendJsonResponse(exchange, 500,
         ApiResponse.error("Internal Service Error: %s".formatted(e.getMessage())));
+  }
+
+  /**
+   * Extract a student-friendly error message from SQLException
+   * Removes Java class names, SQL state codes, and technical jargon
+   */
+  private String extractFriendlySqlError(SQLException e) {
+    String message = e.getMessage();
+
+    if (message == null) {
+      return "An unknown database error occurred";
+    }
+
+    // Remove SQL state codes like [23503-224]
+    message = message.replaceAll("\\[\\d+-\\d+\\]", "").trim();
+
+    // Remove "SQL statement:" and everything after it
+    int sqlStatementIndex = message.indexOf("SQL statement:");
+    if (sqlStatementIndex > 0) {
+      message = message.substring(0, sqlStatementIndex).trim();
+    }
+
+    // Remove semicolons at the end
+    message = message.replaceAll(";\\s*$", "");
+
+    // Make common errors more student-friendly
+    if (message.contains("Referential integrity constraint violation")) {
+      message = "Cannot delete this record - other records depend on it. Delete related records first.";
+    } else if (message.contains("Unique index or primary key violation")) {
+      message = "This record already exists. Try using a different ID or value.";
+    } else if (message.contains("Column") && message.contains("not found")) {
+      message = "Column not found - check your column names for typos.";
+    } else if (message.contains("Table") && message.contains("not found")) {
+      message = "Table not found - check your table name for typos.";
+    } else if (message.contains("Syntax error")) {
+      message = "SQL syntax error - check your query for typos or missing keywords.";
+    }
+
+    return message;
   }
 
   private void sendJsonResponse(HttpExchange exchange, int statusCode, Object response)

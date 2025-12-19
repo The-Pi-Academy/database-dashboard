@@ -65,15 +65,35 @@ class DbManager {
     const container = document.getElementById('sample-queries-list');
     container.innerHTML = '';
 
+    // Group queries by category
+    const categorizedQueries = {};
     queries.forEach(query => {
-      const div = document.createElement('div');
-      div.className = 'sample-query';
-      div.dataset.query = query.query;
-      div.innerHTML = `
-          <div class="sample-query-title">${query.title}</div>
-          <div class="sample-query-code">${query.query}</div>
-      `;
-      container.appendChild(div);
+      const category = query.category || 'Other';
+      if (!categorizedQueries[category]) {
+        categorizedQueries[category] = [];
+      }
+      categorizedQueries[category].push(query);
+    });
+
+    // Render queries by category
+    Object.keys(categorizedQueries).forEach(category => {
+      // Create category header
+      const categoryHeader = document.createElement('div');
+      categoryHeader.className = 'query-category-header';
+      categoryHeader.textContent = category;
+      container.appendChild(categoryHeader);
+
+      // Create queries for this category
+      categorizedQueries[category].forEach(query => {
+        const div = document.createElement('div');
+        div.className = 'sample-query';
+        div.dataset.query = query.query;
+        div.innerHTML = `
+            <div class="sample-query-title">${query.title}</div>
+            <div class="sample-query-code">${query.query}</div>
+        `;
+        container.appendChild(div);
+      });
     });
   }
 
@@ -99,17 +119,20 @@ class DbManager {
     })
     .then(response => response.json())
     .then(response => {
-      const data = response?.data ?? {
-        type: 'ERROR',
-        data: {
+      if (response.type === 'ERROR') {
+        // Extract error message from the response
+        const errorMessage = response?.data?.errorMessage || 'An error occurred';
+        this.displayError(errorMessage, 0);
+      } else {
+        const data = response?.data ?? {
           columns: [],
           rows: [],
-        },
-        execTimeMs: 0
-      };
-      this.displayResults(response, data.execTimeMs);
+          execTimeMs: 0
+        };
+        this.displayResults(response, data.execTimeMs);
+      }
     })
-    .catch(err => this.displayError(err.message, 0));
+    .catch(err => this.displayError(err.message || 'Network error occurred', 0));
   }
 
   displayResults(result, executionTime) {
@@ -119,17 +142,12 @@ class DbManager {
 
     performanceBadge.textContent = `⚡ ${executionTime}ms`;
 
-    switch (result.type) {
-      case 'TABLE':
-        resultsContent.innerHTML = this.formatTableResults(result.data);
-        dataVisualization.innerHTML = `
-            <h4>📈 Data Statistics</h4>
-            <p><strong>Records returned:</strong> ${result.data.count}</p>
-        `;
-        break;
-      case 'ERROR':
-        this.displayError('I don\'t think that\'s right...', 0);
-        break;
+    if (result.type === 'TABLE') {
+      resultsContent.innerHTML = this.formatTableResults(result.data);
+      dataVisualization.innerHTML = `
+          <h4>📈 Data Statistics</h4>
+          <p><strong>Records returned:</strong> ${result.data.count}</p>
+      `;
     }
   }
 
